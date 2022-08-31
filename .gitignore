@@ -1,6 +1,6 @@
 .idea/
 *.png
 images/
-main
-gopack
-generate
+/main
+/gopack
+/generate
