@@ -12,15 +12,27 @@ import (
 	"sort"
 )
 
+const (
+	maxWidth  = 500
+	maxHeight = maxWidth
+)
+
 type Space struct {
 	Free bool
 	Rectangle
 }
 
-const (
-	maxWidth  = 500
-	maxHeight = maxWidth
-)
+func recycleSpace(spaces []Space, r Rectangle) *Space {
+	for i := 0; i < len(spaces); i++ {
+		s := &spaces[i]
+		if !s.Free {
+			s.Free = true
+			s.Rectangle = r
+			return s
+		}
+	}
+	return nil
+}
 
 type Image struct {
 	Name string
@@ -69,23 +81,20 @@ func Pack(dir string) {
 	for i := range images {
 		image := &images[i].Rect
 		spaceFound := false
-		for j := range spaces {
-			space := &spaces[j]
+		for _, space := range spaces {
 			if space.Free && space.Rectangle.canFit(*image) {
-				space.Free = false
 				spaceFound = true
 				image.X = space.X
 				image.Y = space.Y
-				for _, r := range space.cut(*image) {
-					spaces = append(spaces, Space{Free: true, Rectangle: r})
-				}
 
-				for k := range spaces {
-					overlap := &spaces[k]
+				for j := range spaces {
+					overlap := &spaces[j]
 					if overlap.Free && image.overlaps(overlap.Rectangle) {
 						overlap.Free = false
 						for _, r := range overlap.cut(*image) {
-							spaces = append(spaces, Space{Free: true, Rectangle: r})
+							if recycleSpace(spaces, r) == nil {
+								spaces = append(spaces, Space{Free: true, Rectangle: r})
+							}
 						}
 					}
 				}
