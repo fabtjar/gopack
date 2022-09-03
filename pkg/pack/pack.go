@@ -12,54 +12,9 @@ import (
 	"sort"
 )
 
-type Rectangle struct {
-	X, Y, Width, Height int
-}
-
-func (r Rectangle) isLarger(other Rectangle) bool {
-	return r.Width > other.Width || r.Height > other.Height
-}
-
-func (r Rectangle) top() int {
-	return r.Y
-}
-
-func (r Rectangle) bottom() int {
-	return r.Y + r.Height
-}
-
-func (r Rectangle) left() int {
-	return r.X
-}
-
-func (r Rectangle) right() int {
-	return r.X + r.Width
-}
-
-func (r Rectangle) overlaps(other Rectangle) bool {
-	return r.left() < other.right() && r.right() > other.left() && r.top() < other.bottom() && r.bottom() > other.top()
-}
-
 type Space struct {
 	Free bool
 	Rectangle
-}
-
-func (s Space) cut(cut Rectangle) []Space {
-	var spaces []Space
-
-	top := Rectangle{s.left(), s.top(), s.Width, cut.top() - s.top()}
-	bottom := Rectangle{s.left(), cut.bottom(), s.Width, s.bottom() - cut.bottom()}
-	left := Rectangle{s.left(), s.top(), cut.left() - s.left(), s.Height}
-	right := Rectangle{cut.right(), s.top(), s.right() - cut.right(), s.Height}
-
-	for _, r := range []Rectangle{top, bottom, left, right} {
-		if r.Width > 0 && r.Height > 0 {
-			spaces = append(spaces, Space{Free: true, Rectangle: r})
-		}
-	}
-
-	return spaces
 }
 
 const (
@@ -121,13 +76,17 @@ func Pack(dir string) {
 				spaceFound = true
 				image.X = space.X
 				image.Y = space.Y
-				spaces = append(spaces, space.cut(*image)...)
+				for _, r := range space.cut(*image) {
+					spaces = append(spaces, Space{Free: true, Rectangle: r})
+				}
 
 				for k := range spaces {
 					overlap := &spaces[k]
 					if overlap.Free && image.overlaps(overlap.Rectangle) {
 						overlap.Free = false
-						spaces = append(spaces, overlap.cut(*image)...)
+						for _, r := range overlap.cut(*image) {
+							spaces = append(spaces, Space{Free: true, Rectangle: r})
+						}
 					}
 				}
 
