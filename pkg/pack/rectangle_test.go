@@ -1,93 +1,57 @@
 package pack
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
 
 func TestCanFit(t *testing.T) {
-	var r1, r2 Rectangle
-
-	r1 = Rectangle{0, 0, 200, 100}
-	r2 = Rectangle{0, 0, 200, 100}
-	if !r1.canFit(r2) {
-		t.Error("r1.canFit(r2) = false; want true")
+	var tests = []struct {
+		r1, r2 Rectangle
+		want   bool
+	}{
+		{Rectangle{0, 0, 200, 100}, Rectangle{0, 0, 200, 100}, true},
+		{Rectangle{0, 0, 0, 0}, Rectangle{0, 0, 0, 0}, true},
+		{Rectangle{0, 0, 200, 100}, Rectangle{0, 0, 400, 200}, false},
+		{Rectangle{0, 0, 200, 100}, Rectangle{0, 0, 150, 50}, true},
+		{Rectangle{0, 0, 200, 100}, Rectangle{0, 0, 9999, 1}, false},
+		{Rectangle{0, 0, 200, 100}, Rectangle{0, 0, 1, 9999}, false},
 	}
 
-	r1 = Rectangle{0, 0, 0, 0}
-	r2 = Rectangle{0, 0, 0, 0}
-	if !r1.canFit(r2) {
-		t.Error("r1.canFit(r2) = false; want true")
-	}
-
-	r1 = Rectangle{0, 0, 200, 100}
-	r2 = Rectangle{0, 0, 400, 200}
-	if r1.canFit(r2) {
-		t.Error("r1.canFit(r2) = true; want false")
-	}
-
-	r1 = Rectangle{0, 0, 200, 100}
-	r2 = Rectangle{0, 0, 150, 50}
-	if !r1.canFit(r2) {
-		t.Error("r1.canFit(r2) = false; want true")
-	}
-
-	r1 = Rectangle{0, 0, 200, 100}
-	r2 = Rectangle{0, 0, 9999, 1}
-	if r1.canFit(r2) {
-		t.Error("r1.canFit(r2) = true; want false")
-	}
-
-	r1 = Rectangle{0, 0, 200, 100}
-	r2 = Rectangle{0, 0, 1, 9999}
-	if r1.canFit(r2) {
-		t.Error("r1.canFit(r2) = true; want false")
+	for _, tt := range tests {
+		testName := fmt.Sprintf("%v,%v", tt.r1, tt.r2)
+		t.Run(testName, func(t *testing.T) {
+			ans := tt.r1.canFit(tt.r2)
+			if ans != tt.want {
+				t.Errorf("r1.canFit(r2) = %v; want %v", ans, tt.want)
+			}
+		})
 	}
 }
 
 func TestOverlaps(t *testing.T) {
-	var r1, r2 Rectangle
-
-	r1 = Rectangle{0, 0, 200, 150}
-	r2 = Rectangle{0, 0, 200, 150}
-	if !r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = false; want true")
+	var tests = []struct {
+		r1, r2 Rectangle
+		want   bool
+	}{
+		{Rectangle{0, 0, 200, 150}, Rectangle{0, 0, 200, 150}, true},
+		{Rectangle{0, 0, 200, 150}, Rectangle{50, 50, 300, 200}, true},
+		{Rectangle{0, 0, 500, 400}, Rectangle{450, 350, 50, 50}, true},
+		{Rectangle{0, 0, 200, 150}, Rectangle{300, 200, 200, 150}, false},
+		{Rectangle{0, 0, 200, 150}, Rectangle{-300, -200, 200, 150}, false},
+		{Rectangle{0, 0, 200, 150}, Rectangle{200, 0, 200, 150}, false},
+		{Rectangle{0, 0, 200, 150}, Rectangle{-200, 0, 200, 150}, false},
 	}
 
-	r1 = Rectangle{0, 0, 200, 150}
-	r2 = Rectangle{50, 50, 300, 200}
-	if !r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = false; want true")
-	}
-
-	r1 = Rectangle{0, 0, 500, 400}
-	r2 = Rectangle{450, 350, 50, 50}
-	if !r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = false; want true")
-	}
-
-	r1 = Rectangle{0, 0, 200, 150}
-	r2 = Rectangle{300, 200, 200, 150}
-	if r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = true; want false")
-	}
-
-	r1 = Rectangle{0, 0, 200, 150}
-	r2 = Rectangle{-300, -200, 200, 150}
-	if r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = true; want false")
-	}
-
-	r1 = Rectangle{0, 0, 200, 150}
-	r2 = Rectangle{200, 0, 200, 150}
-	if r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = true; want false")
-	}
-
-	r1 = Rectangle{0, 0, 200, 150}
-	r2 = Rectangle{-200, 0, 200, 150}
-	if r1.overlaps(r2) {
-		t.Error("r1.overlaps(r2) = true; want false")
+	for _, tt := range tests {
+		testName := fmt.Sprintf("%v,%v", tt.r1, tt.r2)
+		t.Run(testName, func(t *testing.T) {
+			ans := tt.r1.overlaps(tt.r2)
+			if ans != tt.want {
+				t.Errorf("r1.overlaps(r2) = %v; want %v", ans, tt.want)
+			}
+		})
 	}
 }
 
