@@ -71,7 +71,7 @@ func Pack(dir string) {
 		spaceFound := false
 		for j := range spaces {
 			space := &spaces[j]
-			if space.Free && !image.isLarger(space.Rectangle) {
+			if space.Free && space.Rectangle.canFit(*image) {
 				space.Free = false
 				spaceFound = true
 				image.X = space.X

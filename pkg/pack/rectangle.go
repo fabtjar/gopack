@@ -4,8 +4,8 @@ type Rectangle struct {
 	X, Y, Width, Height int
 }
 
-func (r Rectangle) isLarger(other Rectangle) bool {
-	return r.Width > other.Width || r.Height > other.Height
+func (r Rectangle) canFit(other Rectangle) bool {
+	return other.Width <= r.Width && other.Height <= r.Height
 }
 
 func (r Rectangle) top() int {
