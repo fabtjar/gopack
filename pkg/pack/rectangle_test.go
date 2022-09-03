@@ -105,7 +105,7 @@ func TestCut(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			rects := tt.r1.cut(tt.r2)
 			if !reflect.DeepEqual(rects, tt.want) {
-				t.Errorf("r1.overlaps(r2) = %v; want %v", rects, tt.want)
+				t.Errorf("r1.cut(r2) = %v; want %v", rects, tt.want)
 			}
 		})
 	}
