@@ -29,6 +29,10 @@ func (r Rectangle) overlaps(other Rectangle) bool {
 }
 
 func (r Rectangle) cut(cut Rectangle) []Rectangle {
+	if !r.overlaps(cut) {
+		return []Rectangle{}
+	}
+
 	top := Rectangle{r.left(), r.top(), r.Width, cut.top() - r.top()}
 	bottom := Rectangle{r.left(), cut.bottom(), r.Width, r.bottom() - cut.bottom()}
 	left := Rectangle{r.left(), r.top(), cut.left() - r.left(), r.Height}
