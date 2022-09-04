@@ -10,6 +10,8 @@ import (
 	"log"
 	"os"
 	"sort"
+
+	calc "github.com/fabtjar/gopack/pkg/math"
 )
 
 const (
@@ -74,8 +76,8 @@ func Pack(dir string) {
 	images := getImages(dir)
 
 	sort.Slice(images, func(i, j int) bool {
-		iImg, jImg := images[i], images[j]
-		return iImg.Rect.Width*iImg.Rect.Height > jImg.Rect.Width*jImg.Rect.Height
+		a, b := images[i].Rect, images[j].Rect
+		return calc.Max(a.Width, a.Height) > calc.Max(b.Width, b.Height)
 	})
 
 	sheetCount := 1
@@ -111,8 +113,11 @@ func Pack(dir string) {
 		}
 
 		sort.Slice(spaces, func(i, j int) bool {
-			iSpc, jSpc := spaces[i], spaces[j]
-			return iSpc.X*iSpc.Y+iSpc.Width*iSpc.Height < jSpc.X*jSpc.Y+jSpc.Width*jSpc.Height
+			a, b := spaces[i], spaces[j]
+			if a.Sheet != b.Sheet {
+				return a.Sheet > b.Sheet
+			}
+			return a.X*a.X+a.Y*a.Y < b.X*b.X+b.Y*b.Y
 		})
 	}
 
