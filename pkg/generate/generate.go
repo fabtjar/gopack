@@ -19,11 +19,11 @@ func init() {
 func clearImagesDir() error {
 	err := os.RemoveAll("images")
 	if err != nil {
-		return fmt.Errorf("faied to clear images directory: %v", err)
+		return fmt.Errorf("failed to clear images directory: %v", err)
 	}
 	err = os.MkdirAll("images", os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("faied to create images directory: %v", err)
+		return fmt.Errorf("failed to create images directory: %v", err)
 	}
 	return nil
 }
@@ -31,7 +31,7 @@ func clearImagesDir() error {
 func downloadImage(filename, url string) error {
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("faied to get HTTP response: %v", err)
+		return fmt.Errorf("failed to get HTTP response: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -41,7 +41,7 @@ func downloadImage(filename, url string) error {
 
 	f, err := os.Create(fmt.Sprintf("images/%s", filename))
 	if err != nil {
-		return fmt.Errorf("faied to create file: %v", err)
+		return fmt.Errorf("failed to create file: %v", err)
 	}
 	defer f.Close()
 
