@@ -6,7 +6,6 @@ import (
 	"image/color"
 	"image/draw"
 	"image/png"
-	"io/ioutil"
 	"log"
 	"os"
 	"sort"
@@ -37,43 +36,8 @@ func getUsedSpace(spaces []Space, r Rectangle) *Space {
 	return nil
 }
 
-type Image struct {
-	Name  string
-	Rect  Rectangle
-	Sheet int
-	image.Image
-}
-
-func getImages(dir string) []Image {
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		log.Fatal("Failed to read images dir.")
-	}
-
-	var images []Image
-	for _, file := range files {
-		img := getImage(fmt.Sprintf("%s/%s", dir, file.Name()))
-		size := img.Bounds().Max
-		images = append(images, Image{Name: file.Name(), Rect: Rectangle{0, 0, size.X, size.Y}, Image: img})
-	}
-	return images
-}
-
-func getImage(filename string) image.Image {
-	f, err := os.Open(filename)
-	if err != nil {
-		log.Fatal("Failed to read file.")
-	}
-	defer f.Close()
-	img, err := png.Decode(f)
-	if err != nil {
-		log.Fatal("Failed to decode image.")
-	}
-	return img
-}
-
 func Pack(dir string) {
-	images := getImages(dir)
+	images := getImageData(dir)
 
 	sort.Slice(images, func(i, j int) bool {
 		a, b := images[i].Rect, images[j].Rect
@@ -137,7 +101,8 @@ func Pack(dir string) {
 				continue
 			}
 			pos := image.Point{-img.Rect.X, -img.Rect.Y}
-			draw.Draw(sheet, sheet.Bounds(), img.Image, pos, draw.Src)
+			file := getImage(fmt.Sprintf("%s/%s", dir, img.Name))
+			draw.Draw(sheet, sheet.Bounds(), file, pos, draw.Src)
 		}
 
 		f, err := os.Create(fmt.Sprintf("sheet_%03d.png", i+1))
