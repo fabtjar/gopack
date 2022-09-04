@@ -1,7 +1,10 @@
 package pack
 
 type Rectangle struct {
-	X, Y, Width, Height int
+	X      int `json:"x"`
+	Y      int `json:"y"`
+	Width  int `json:"width"`
+	Height int `json:"height"`
 }
 
 func (r Rectangle) canFit(other Rectangle) bool {

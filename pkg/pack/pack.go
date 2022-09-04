@@ -1,6 +1,7 @@
 package pack
 
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/color"
@@ -114,5 +115,20 @@ func Pack(dir string) {
 		if err != nil {
 			log.Fatalf("Failed to write to sheet file: %v", err)
 		}
+	}
+
+	mar, err := json.MarshalIndent(images, "", "  ")
+	if err != nil {
+		log.Fatalf("Failed to marshal json: %v", err)
+	}
+
+	f, err := os.Create("atlas.json")
+	if err != nil {
+		log.Fatalf("Failed to create atlas: %v", err)
+	}
+	defer f.Close()
+	_, err = f.WriteString(string(mar))
+	if err != nil {
+		log.Fatalf("Failed to write to atlas: %v", err)
 	}
 }

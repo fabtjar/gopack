@@ -10,9 +10,9 @@ import (
 )
 
 type Image struct {
-	Name  string
-	Rect  Rectangle
-	Sheet int
+	Name  string    `json:"name"`
+	Rect  Rectangle `json:"rect"`
+	Sheet int       `json:"sheet"`
 }
 
 func getImageData(dir string) []Image {
