@@ -29,14 +29,14 @@ func clearImagesDir() error {
 }
 
 func downloadImage(filename, url string) error {
-	resp, err := http.Get(url)
+	res, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to get HTTP response: %v", err)
 	}
-	defer resp.Body.Close()
+	defer res.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("error with response: %v", resp.Status)
+	if res.StatusCode != 200 {
+		return fmt.Errorf("error with response: %v", res.Status)
 	}
 
 	f, err := os.Create(fmt.Sprintf("images/%s", filename))
@@ -45,7 +45,7 @@ func downloadImage(filename, url string) error {
 	}
 	defer f.Close()
 
-	_, err = io.Copy(f, resp.Body)
+	_, err = io.Copy(f, res.Body)
 	if err != nil {
 		return fmt.Errorf("failed to copy image to file: %v", err)
 	}
