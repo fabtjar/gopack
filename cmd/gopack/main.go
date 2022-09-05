@@ -1,7 +1,12 @@
 package main
 
-import "github.com/fabtjar/gopack/pkg/pack"
+import (
+	"github.com/fabtjar/gopack/pkg/pack"
+)
 
 func main() {
-	pack.Pack("images")
+	images := pack.GetImageData("images")
+	pack.Pack(images)
+	pack.CreateSheets(images)
+	pack.CreateAtlas(images)
 }
