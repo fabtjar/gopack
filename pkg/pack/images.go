@@ -7,6 +7,7 @@ import (
 	"image/color"
 	"image/draw"
 	"image/png"
+	"io/ioutil"
 	"log"
 	"os"
 	"sort"
@@ -19,13 +20,50 @@ const (
 	maxHeight = maxWidth
 )
 
+type Image struct {
+	Name     string    `json:"name"`
+	Location string    `json:"-"`
+	Rect     Rectangle `json:"rect"`
+	Sheet    int       `json:"sheet"`
+}
+
 type Space struct {
 	Free  bool
 	Sheet int
 	Rectangle
 }
 
+func getImageFile(name string) image.Image {
+	f, err := os.Open(name)
+	if err != nil {
+		log.Fatal("Failed to read file.")
+	}
+	defer f.Close()
+	img, err := png.Decode(f)
+	if err != nil {
+		log.Fatal("Failed to decode image.")
+	}
+	return img
+}
+
 type Images []Image
+
+func GetImagesFromDir(dir string) Images {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Fatal("Failed to read images dir.")
+	}
+
+	var images []Image
+	for _, file := range files {
+		name := file.Name()
+		location := fmt.Sprintf("%s/%s", dir, name)
+		file := getImageFile(location)
+		size := file.Bounds().Max
+		images = append(images, Image{Name: name, Location: location, Rect: Rectangle{0, 0, size.X, size.Y}})
+	}
+	return images
+}
 
 func (images Images) CreateAtlas() {
 	mar, err := json.MarshalIndent(images, "", "  ")
@@ -73,7 +111,7 @@ func (images Images) CreateSheets() {
 				continue
 			}
 			pos := image.Point{-img.Rect.X, -img.Rect.Y}
-			file := getImage(img.Location)
+			file := getImageFile(img.Location)
 			draw.Draw(sheet, sheet.Bounds(), file, pos, draw.Src)
 		}
 
