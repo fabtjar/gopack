@@ -25,19 +25,9 @@ type Space struct {
 	Rectangle
 }
 
-func getUsedSpace(spaces []Space, r Rectangle) *Space {
-	for i := 0; i < len(spaces); i++ {
-		s := &spaces[i]
-		if !s.Free {
-			s.Free = true
-			s.Rectangle = r
-			return s
-		}
-	}
-	return nil
-}
+type Images []Image
 
-func CreateAtlas(images []Image) {
+func (images Images) CreateAtlas() {
 	mar, err := json.MarshalIndent(images, "", "  ")
 	if err != nil {
 		log.Fatalf("Failed to marshal json: %v", err)
@@ -54,7 +44,7 @@ func CreateAtlas(images []Image) {
 	}
 }
 
-func getSheetCount(images []Image) int {
+func (images Images) getSheetCount() int {
 	var n int
 	for _, img := range images {
 		if img.Sheet > n {
@@ -64,12 +54,12 @@ func getSheetCount(images []Image) int {
 	return n
 }
 
-func CreateSheets(images []Image) {
-	sheetNumber := getSheetCount(images)
+func (images Images) CreateSheets() {
+	sheetCount := images.getSheetCount()
 
 	width := maxWidth
 	height := maxHeight
-	for i := 1; i <= sheetNumber; i++ {
+	for i := 1; i <= sheetCount; i++ {
 		sheet := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
 
 		for x := 0; x < width; x++ {
@@ -99,7 +89,7 @@ func CreateSheets(images []Image) {
 	}
 }
 
-func Pack(images []Image) {
+func (images Images) Pack() {
 	sort.Slice(images, func(i, j int) bool {
 		a, b := images[i].Rect, images[j].Rect
 		return calc.Max(a.Width, a.Height) > calc.Max(b.Width, b.Height)

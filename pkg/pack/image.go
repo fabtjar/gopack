@@ -16,7 +16,7 @@ type Image struct {
 	Sheet    int       `json:"sheet"`
 }
 
-func GetImageData(dir string) []Image {
+func GetImagesFromDir(dir string) Images {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal("Failed to read images dir.")

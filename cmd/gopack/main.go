@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	images := pack.GetImageData("images")
-	pack.Pack(images)
-	pack.CreateSheets(images)
-	pack.CreateAtlas(images)
+	images := pack.GetImagesFromDir("images")
+	images.Pack()
+	images.CreateSheets()
+	images.CreateAtlas()
 }
