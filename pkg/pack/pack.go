@@ -61,15 +61,15 @@ func getSheetCount(images []Image) int {
 			n = img.Sheet
 		}
 	}
-	return n + 1
+	return n
 }
 
 func CreateSheets(images []Image) {
-	sheetCount := getSheetCount(images)
+	sheetNumber := getSheetCount(images)
 
 	width := maxWidth
 	height := maxHeight
-	for i := 0; i < sheetCount; i++ {
+	for i := 1; i <= sheetNumber; i++ {
 		sheet := image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{width, height}})
 
 		for x := 0; x < width; x++ {
@@ -87,7 +87,7 @@ func CreateSheets(images []Image) {
 			draw.Draw(sheet, sheet.Bounds(), file, pos, draw.Src)
 		}
 
-		f, err := os.Create(fmt.Sprintf("sheet_%03d.png", i+1))
+		f, err := os.Create(fmt.Sprintf("sheet_%03d.png", i))
 		if err != nil {
 			log.Fatalf("Failed to create sheet file: %v", err)
 		}
@@ -105,8 +105,8 @@ func Pack(images []Image) {
 		return calc.Max(a.Width, a.Height) > calc.Max(b.Width, b.Height)
 	})
 
-	sheetCount := 1
-	spaces := []Space{{Free: true, Sheet: 0, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}}
+	sheetNumber := 1
+	spaces := []Space{{Free: true, Sheet: sheetNumber, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}}
 
 	for i := range images {
 		image := &images[i]
@@ -118,8 +118,8 @@ func Pack(images []Image) {
 			}
 		}
 		if space == nil {
-			space = &Space{Free: true, Sheet: sheetCount, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}
-			sheetCount++
+			space = &Space{Free: true, Sheet: sheetNumber, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}
+			sheetNumber++
 			spaces = append(spaces, *space)
 		}
 
