@@ -25,6 +25,7 @@ type Image struct {
 	Location string    `json:"-"`
 	Rect     Rectangle `json:"rect"`
 	Sheet    int       `json:"sheet"`
+	Set      bool      `json:"-"`
 }
 
 type Space struct {
@@ -133,44 +134,54 @@ func (images Images) Pack() {
 		return calc.Max(a.Width, a.Height) > calc.Max(b.Width, b.Height)
 	})
 
-	sheetNumber := 1
-	spaces := []Space{{Free: true, Sheet: sheetNumber, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}}
+	sheetNumber := 0
 
-	for i := range images {
-		image := &images[i]
-		var space *Space
-		for _, s := range spaces {
-			if s.Free && s.Rectangle.canFit(image.Rect) {
-				space = &s
-				break
+	for setCount := 0; setCount < len(images); {
+		sheetNumber++
+		spaces := []Space{{Free: true, Sheet: sheetNumber, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}}
+
+		for i := range images {
+			image := &images[i]
+
+			if image.Set {
+				continue
 			}
-		}
-		if space == nil {
-			space = &Space{Free: true, Sheet: sheetNumber, Rectangle: Rectangle{Width: maxWidth, Height: maxHeight}}
-			sheetNumber++
-			spaces = append(spaces, *space)
-		}
 
-		image.Rect.X = space.X
-		image.Rect.Y = space.Y
-		image.Sheet = space.Sheet
-
-		for j := range spaces {
-			overlap := &spaces[j]
-			if overlap.Free && image.Rect.overlaps(overlap.Rectangle) {
-				overlap.Free = false
-				for _, r := range overlap.cut(image.Rect) {
-					spaces = append(spaces, Space{Free: true, Sheet: overlap.Sheet, Rectangle: r})
+			var space *Space
+			for _, s := range spaces {
+				if s.Free && s.Rectangle.canFit(image.Rect) {
+					space = &s
+					break
 				}
 			}
-		}
-
-		sort.Slice(spaces, func(i, j int) bool {
-			a, b := spaces[i], spaces[j]
-			if a.Sheet != b.Sheet {
-				return a.Sheet > b.Sheet
+			if space == nil {
+				continue
 			}
-			return a.X*a.X+a.Y*a.Y < b.X*b.X+b.Y*b.Y
-		})
+
+			image.Set = true
+			setCount++
+
+			image.Rect.X = space.X
+			image.Rect.Y = space.Y
+			image.Sheet = space.Sheet
+
+			for j := range spaces {
+				overlap := &spaces[j]
+				if overlap.Free && image.Rect.overlaps(overlap.Rectangle) {
+					overlap.Free = false
+					for _, r := range overlap.cut(image.Rect) {
+						spaces = append(spaces, Space{Free: true, Sheet: overlap.Sheet, Rectangle: r})
+					}
+				}
+			}
+
+			sort.Slice(spaces, func(i, j int) bool {
+				a, b := spaces[i], spaces[j]
+				if a.Sheet != b.Sheet {
+					return a.Sheet > b.Sheet
+				}
+				return a.X*a.X+a.Y*a.Y < b.X*b.X+b.Y*b.Y
+			})
+		}
 	}
 }
