@@ -37,12 +37,12 @@ type Space struct {
 func getImageFile(name string) image.Image {
 	f, err := os.Open(name)
 	if err != nil {
-		log.Fatal("Failed to read file.")
+		log.Fatalf("Failed to read file '%s'.", name)
 	}
 	defer f.Close()
 	img, err := png.Decode(f)
 	if err != nil {
-		log.Fatal("Failed to decode image.")
+		log.Fatalf("Failed to decode image '%s'.", name)
 	}
 	return img
 }
