@@ -74,16 +74,18 @@ func main() {
 	wg.Add(imageCount)
 	for i := 0; i < imageCount; i++ {
 		go func(n int) {
-			filename := fmt.Sprintf("image_%03d.png", n)
-			width := (rand.Intn(4) + 1) * 20
-			height := (rand.Intn(4) + 1) * 20
-			color := rand.Intn(0xffffff)
-			url := fmt.Sprintf("https://dummyimage.com/%dx%d/%06x/000000.png", width, height, color)
-			err = downloadImage(filename, url)
-			if err != nil {
-				log.Fatalf("Failed to download image #%d: %v", n, err)
+			for {
+				filename := fmt.Sprintf("image_%03d.png", n)
+				width := (rand.Intn(4) + 1) * 20
+				height := (rand.Intn(4) + 1) * 20
+				color := rand.Intn(0xffffff)
+				url := fmt.Sprintf("https://dummyimage.com/%dx%d/%06x/000000.png", width, height, color)
+				err = downloadImage(filename, url)
+				if err == nil {
+					wg.Done()
+					break
+				}
 			}
-			wg.Done()
 		}(i + 1)
 	}
 	wg.Wait()
